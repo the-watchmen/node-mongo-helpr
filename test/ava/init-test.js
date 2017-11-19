@@ -1,7 +1,7 @@
 import test from 'ava'
 import debug from 'debug'
 import {UNIQUENESS_ERROR} from '@watchmen/helpr'
-import {initDb} from 'mongo-test-helpr'
+import {initDb} from '@watchmen/mongo-test-helpr'
 
 import {
   getNextSequence,
