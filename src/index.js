@@ -3,7 +3,7 @@ import mongodb from 'mongodb'
 import debug from 'debug'
 import _ from 'lodash'
 import config from 'config'
-import {stringify, isHex, debugElements, UNIQUENESS_ERROR, join} from 'helpr'
+import {stringify, isHex, debugElements, UNIQUENESS_ERROR, join} from '@watchmen/helpr'
 
 const dbg = debug('app:mongo-helpr')
 
@@ -25,8 +25,20 @@ function setOption({options, config, key, option, hook = _.identity}) {
 }
 
 export const options = {}
-setOption({config, options, key: 'mongo.connectTimeoutMs', option: 'connectTimeoutMS', hook: parseInt})
-setOption({config, options, key: 'mongo.socketTimeoutMs', option: 'socketTimeoutMS', hook: parseInt})
+setOption({
+  config,
+  options,
+  key: 'mongo.connectTimeoutMs',
+  option: 'connectTimeoutMS',
+  hook: parseInt
+})
+setOption({
+  config,
+  options,
+  key: 'mongo.socketTimeoutMs',
+  option: 'socketTimeoutMS',
+  hook: parseInt
+})
 setOption({config, options, key: 'mongo.poolSize', option: 'poolSize', hook: parseInt})
 setOption({config, options, key: 'mongo.replicaSet', option: 'replicaSet'})
 
@@ -41,7 +53,7 @@ export function getConnectionString() {
 }
 
 export async function getDb({init} = {}) {
-  init && await closeDb()
+  init && (await closeDb())
 
   if (!_mongoHelpr.db) {
     _mongoHelpr.db = await client.connect(getConnectionString(), options)
@@ -81,7 +93,7 @@ export function oid(value, {strict} = {}) {
   }
   let result
   if (value) {
-    if ((value.length <= oidLength) && (isHex(value))) {
+    if (value.length <= oidLength && isHex(value)) {
       result = new mongodb.ObjectID(value.padStart(oidLength, '0'))
     } else {
       result = value
@@ -93,21 +105,25 @@ export function oid(value, {strict} = {}) {
 }
 
 export function isValidOid(value) {
-  return ((value.length === oidLength) && isHex(value))
+  return value.length === oidLength && isHex(value)
 }
 
 export async function findOne({db, query, steps, collectionName, isRequired}) {
-  const _db = db || await getDb()
+  const _db = db || (await getDb())
   const collection = _db.collection(collectionName)
   const cursor = steps ? collection.aggregate(steps, {allowDiskUse: true}) : collection.find(query)
   const result = await cursor.toArray()
   if (result.length > 1) {
-    throw new Error(`unexpected multiple hits, query=${stringify(steps || query)}, collection=${collectionName}`)
+    throw new Error(
+      `unexpected multiple hits, query=${stringify(steps || query)}, collection=${collectionName}`
+    )
   }
   if (isRequired && result.length !== 1) {
-    throw new Error(`record required, query=${stringify(steps || query)}, collection=${collectionName}`)
+    throw new Error(
+      `record required, query=${stringify(steps || query)}, collection=${collectionName}`
+    )
   }
-  return (result.length === 1) ? result[0] : null
+  return result.length === 1 ? result[0] : null
 }
 
 export async function requireOne(opts) {
@@ -115,20 +131,15 @@ export async function requireOne(opts) {
 }
 
 export async function getCount({db, query, steps = [], collectionName}) {
-  const _db = db || await getDb()
+  const _db = db || (await getDb())
   const collection = _db.collection(collectionName)
   const cursor = collection.aggregate(
-    steps.concat(
-      [
-        {$match: query},
-        {$group: {_id: null, count: {$sum: 1}}}
-      ]
-    ),
+    steps.concat([{$match: query}, {$group: {_id: null, count: {$sum: 1}}}]),
     {allowDiskUse: true}
   )
   const result = await cursor.toArray()
   dbg('count: result=%o', result)
-  return (result.length === 1) ? result[0].count : 0
+  return result.length === 1 ? result[0].count : 0
 }
 
 export async function assertNone({db, query, steps = [], collectionName}) {
@@ -143,7 +154,7 @@ export async function assertNone({db, query, steps = [], collectionName}) {
 
 export async function getNextSequence(entity, {db} = {}) {
   assert(entity, 'entity required')
-  const _db = db || await getDb()
+  const _db = db || (await getDb())
   const result = await _db.collection(SEQUENCES_NAME).findOneAndUpdate(
     {_id: entity},
     {$inc: {sequence: 1}},
@@ -158,7 +169,7 @@ export async function getNextSequence(entity, {db} = {}) {
 
 export async function createIndices({indices, db, collectionName, isDrop}) {
   assert(indices, 'indices required')
-  const _db = db || await getDb()
+  const _db = db || (await getDb())
   const target = _db.collection(collectionName)
   if (isDrop) {
     try {
@@ -168,38 +179,55 @@ export async function createIndices({indices, db, collectionName, isDrop}) {
     } catch (err) {
       if (err.code === 26) {
         // collection doesn't exist code
-        dbg('attempted to drop indices for non-existent collection=%o, continuing...', collectionName)
+        dbg(
+          'attempted to drop indices for non-existent collection=%o, continuing...',
+          collectionName
+        )
       } else {
         throw err
       }
     }
   }
-  await Promise.all(indices.map(index => {
-    return Array.isArray(index) ? target.createIndex(...index) : target.createIndex(index)
-  }))
+  await Promise.all(
+    indices.map(index => {
+      return Array.isArray(index) ? target.createIndex(...index) : target.createIndex(index)
+    })
+  )
   debugElements({dbg, msg: `create-indices: collection=${collectionName}, indices`, o: indices})
   return true
 }
 
 export async function createValidator({validator, db, collectionName}) {
   assert(validator, 'validator required')
-  const _db = db || await getDb()
+  const _db = db || (await getDb())
   const collection = await _db.createCollection(collectionName, {w: 1})
   assert(collection, 'collection required')
   await _db.command({collMod: collectionName, validator})
-  debugElements({dbg, msg: `create-validator: collection=${collectionName}, validator`, o: validator})
+  debugElements({
+    dbg,
+    msg: `create-validator: collection=${collectionName}, validator`,
+    o: validator
+  })
 }
 
 export function existsIndex(...fields) {
   return [
-    _.transform(fields, (result, field) => {
-      result[field] = 1
-    }, {}),
+    _.transform(
+      fields,
+      (result, field) => {
+        result[field] = 1
+      },
+      {}
+    ),
     {
       unique: true,
-      partialFilterExpression: _.transform(fields, (result, field) => {
-        result[field] = {$exists: true}
-      }, {})
+      partialFilterExpression: _.transform(
+        fields,
+        (result, field) => {
+          result[field] = {$exists: true}
+        },
+        {}
+      )
     }
   ]
 }
@@ -251,13 +279,10 @@ export function toDotNotation({target, path = [], result = {}}) {
 }
 
 export function sanitizeKeys(data) {
-  return _.isPlainObject(data) ?
-    _.transform(
-      data,
-      (result, val, key) => {
+  return _.isPlainObject(data)
+    ? _.transform(data, (result, val, key) => {
         const _key = key.startsWith('$') ? key.replace('$', '_$') : key
         result[_key.replace(/\./g, '_')] = sanitizeKeys(val)
-      }
-    ) :
-    data
+      })
+    : data
 }
