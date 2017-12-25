@@ -3,13 +3,12 @@ import mongodb from 'mongodb'
 import debug from 'debug'
 import _ from 'lodash'
 import config from 'config'
-import {stringify, isHex, debugElements, UNIQUENESS_ERROR, join} from '@watchmen/helpr'
+import {stringify, debugElements, UNIQUENESS_ERROR} from '@watchmen/helpr'
 
 const dbg = debug('app:mongo-helpr')
 
 export const SEQUENCES_NAME = _.get(config, 'mongo.sequences', 'sequences')
 
-const oidLength = 24
 const logLevel = _.get(config, 'mongo.logger.level')
 if (logLevel) {
   mongodb.Logger.setLevel(logLevel)
@@ -42,7 +41,7 @@ setOption({
 setOption({config, options, key: 'mongo.poolSize', option: 'poolSize', hook: parseInt})
 setOption({config, options, key: 'mongo.replicaSet', option: 'replicaSet'})
 
-const client = mongodb.MongoClient
+// const client = mongodb.MongoClient
 var _mongoHelpr = {} // singleton, see: http://stackoverflow.com/a/14464750/2371903
 
 export function getConnectionString() {
@@ -55,19 +54,25 @@ export function getConnectionString() {
 export async function getDb({init} = {}) {
   init && (await closeDb())
 
-  if (!_mongoHelpr.db) {
-    _mongoHelpr.db = await client.connect(getConnectionString(), options)
+  if (!_mongoHelpr.client) {
+    const client = await mongodb.MongoClient.connect(getConnectionString(), options)
+    assert(client, 'client expected')
+    const db = client.db(dbName())
+    assert(db, 'db expected')
+    _mongoHelpr = {client, db}
   }
 
   return _mongoHelpr.db
 }
 
 export async function closeDb() {
-  if (_mongoHelpr.db) {
-    const db = _mongoHelpr.db
-    await _mongoHelpr.db.close()
-    _mongoHelpr.db = null
-    dbg('close-db: closed db=%o', db.databaseName)
+  const {client, db} = _mongoHelpr
+  if (client) {
+    if (client.isConnected(db.databaseName)) {
+      await client.close()
+      _mongoHelpr = {}
+      dbg('close-db: closed db=%o', db.databaseName)
+    }
   }
 }
 
@@ -86,26 +91,17 @@ export function parseParam(value) {
   return value
 }
 
-export function oid(value, {strict} = {}) {
-  const isValid = value ? isValidOid(value) : true
-  if (strict && !isValid) {
-    throw new Error(`unable to create oid from value=${value}`)
-  }
-  let result
-  if (value) {
-    if (value.length <= oidLength && isHex(value)) {
-      result = new mongodb.ObjectID(value.padStart(oidLength, '0'))
-    } else {
-      result = value
+// convert to oid if possible, otherwise just return value
+export function oid({value, strict} = {}) {
+  try {
+    return new mongodb.ObjectID(value)
+  } catch (err) {
+    if (strict) {
+      throw err
     }
-  } else {
-    result = new mongodb.ObjectID()
+    dbg('warning: unable to convert value=%o into oid, returning as is...')
+    return value
   }
-  return result
-}
-
-export function isValidOid(value) {
-  return value.length === oidLength && isHex(value)
 }
 
 export async function findOne({db, query, steps, collectionName, isRequired}) {
@@ -174,7 +170,7 @@ export async function createIndices({indices, db, collectionName, isDrop}) {
   if (isDrop) {
     try {
       const result = await target.dropIndexes()
-      assert(result.ok, 'ok result required')
+      assert(result, 'truthy result required')
       dbg('dropped indices for collection=%o', collectionName)
     } catch (err) {
       if (err.code === 26) {
@@ -262,20 +258,6 @@ export function pushOrs({query, ors}) {
     return _query
   }
   return {...query, $or: ors}
-}
-
-export function toDotNotation({target, path = [], result = {}}) {
-  return _.reduce(
-    target,
-    (result, val, key) => {
-      if (_.isPlainObject(val)) {
-        return toDotNotation({target: val, path: path.concat([key]), result})
-      }
-      result[join(path.concat([key]))] = val
-      return result
-    },
-    result
-  )
 }
 
 export function sanitizeKeys(data) {

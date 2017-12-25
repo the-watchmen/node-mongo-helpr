@@ -80,16 +80,16 @@ test('oid', t => {
 
 test('oid: valid value', t => {
   const value = '012345678901234567890123'
-  t.is(oid(value).toHexString(), mongodb.ObjectId(value).toHexString())
+  t.is(oid({value}).toHexString(), mongodb.ObjectId(value).toHexString())
 })
 
-test('oid: invalid value lax', t => {
-  t.is(oid('1').toHexString(), mongodb.ObjectId('000000000000000000000001').toHexString())
-})
+// test('oid: invalid value lax', t => {
+//   t.is(oid({value: '1'}).toHexString(), mongodb.ObjectId('000000000000000000000001').toHexString())
+// })
 
 test('oid: invalid value strict', t => {
   t.throws(() => {
-    oid('1', {strict: true})
+    oid({value: '1', strict: true})
   })
 })
 
@@ -225,3 +225,9 @@ test('options', t => {
     socketTimeoutMS: 3000
   })
 })
+
+// test('tryToOid', t => {
+//   const oid = oid('123456789012')
+//   dbg('oid=%o', oid)
+//   t.true(oid instanceof mongodb.ObjectId)
+// })
