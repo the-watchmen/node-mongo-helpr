@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "run ava test",
+      "program": "${workspaceRoot}/node_modules/ava/profile.js",
+      "args": ["-s", "${file}"],
+      "env": {
+        "DEBUG": "test:*,app:*;lib:*"
+      },
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "run ava single",
+      "program": "${workspaceRoot}/node_modules/ava/profile.js",
+      "args": ["-s", "test/ava/test.js","-m tryToOid"],
+      "env": {
+        "DEBUG": "test:*,app:*;lib:*"
+      },
+      "console": "integratedTerminal",
+      "sourceMaps": true
+    }
+  ]
+}

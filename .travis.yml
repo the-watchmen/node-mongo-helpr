@@ -14,8 +14,6 @@ before_deploy:
 deploy:
   provider: npm
   email: anthony.kerz@gmail.com
-  api_key:
-    secure: ufqNAd/EStgJkbxA0OYgSFX7f4I72bqhVU1kp1wGVZGmRNIXY6RyiIzLC4canRmzl2mNW3bA3CE9MzmjbO19wIGHIrYT/PGtw7/40wSTUqapRozSYeWTQyN5KmU9CFMvm0emhSOqdOPg30cK5xvpqVeV7eNaa9TkVYzvn3JWXUCHo8k5dWNYxUxE8zocGd6J6D/gvi21+zo5+kWqwU0EshxIUHi9QvdxxBr6m2HXxUyMzqt0BEfVANlEu0Nk5hKDUrDlie8dOMaZzsQeV44rlIy7qxjtHrQBzK9ii186WbNFKVvTo6nOGDpzibqLwWeZcZjIi7VzeBj/8LUy+tgCh4IEl5hp0jBDHyU+TACd46Qy2Q+/Vi/+p2xfO35TfNx2AL02nS/sly8PyL8NG0nmCEIVVKFeJQfPN6nhY1fEfI6ZNQa6fNQzT6YJdc8vkgJxfvjmgAOmra+ftT/6DqIRaCJ3MRum/CGNoV9qStCzh7CosXxi8jvkkWKT8Eir3+f63FeQHFbcKb0AjerU7672Cm+9lSpBX4FFqu4in0ufv9nQ/S4StVazn8eyv7Vkmbfd1L7hdmt7BodfsHTzCXl17ih0FAbx8Vm2PE0DCa4TObHp5vroa929YKhY4j20kEsL/1uUtscBRBEC21eBTB33Lt5O6KBSrj1dU67Yeyz8syU=
   skip_cleanup: true
   on:
     branch: master
