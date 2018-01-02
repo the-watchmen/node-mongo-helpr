@@ -1,10 +1,8 @@
 import test from 'ava'
 import debug from 'debug'
-import mongodb from 'mongodb'
 import {assertAutomatedTest, initDb} from '@watchmen/mongo-test-helpr'
 import {
   parseParam,
-  oid,
   getNextSequence,
   existsIndex,
   getDb,
@@ -72,25 +70,6 @@ test('parseParam: regex', t => {
 
 test('parseParam: regex with option', t => {
   t.deepEqual(parseParam('/foo/i'), {$regex: 'foo', $options: 'i'})
-})
-
-test('oid', t => {
-  t.truthy(oid() instanceof mongodb.ObjectId)
-})
-
-test('oid: valid value', t => {
-  const value = '012345678901234567890123'
-  t.is(oid({value}).toHexString(), mongodb.ObjectId(value).toHexString())
-})
-
-// test('oid: invalid value lax', t => {
-//   t.is(oid({value: '1'}).toHexString(), mongodb.ObjectId('000000000000000000000001').toHexString())
-// })
-
-test('oid: invalid value strict', t => {
-  t.throws(() => {
-    oid({value: '1', strict: true})
-  })
 })
 
 test('getNextSequence', async t => {

@@ -1,6 +1,6 @@
 {
   "name": "@watchmen/mongo-helpr",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "",
   "main": "dist/index.js",
   "repository": "the-watchmen/node-mongo-helpr",
@@ -14,18 +14,18 @@
   "author": "tony kerz",
   "license": "ISC",
   "dependencies": {
-    "@watchmen/helpr": "^2.1.0",
-    "config": "^1.28.1",
+    "@watchmen/helpr": "^2.2.2",
+    "config": "^1.29.0",
     "debug": "^3.1.0",
     "lodash": "^4.17.4",
     "mongodb": "^3.0.1"
   },
   "devDependencies": {
-    "@watchmen/mongo-test-helpr": "^0.1.11",
+    "@watchmen/mongo-test-helpr": "^1.0.0",
     "ava": "^0.24.0",
     "babel-cli": "^6.24.1",
     "babel-core": "^6.24.1",
-    "babel-eslint": "^8.1.0",
+    "babel-eslint": "^8.1.2",
     "babel-preset-env": "^1.4.0",
     "babel-preset-stage-0": "^6.5.0",
     "cross-env": "^5.1.3",
