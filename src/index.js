@@ -268,3 +268,23 @@ export function sanitizeKeys(data) {
       })
     : data
 }
+
+export async function drop({collection}) {
+  try {
+    const result = await collection.drop()
+    assert(result, 'truthy result required')
+    dbg('drop: dropped collection=%o', collection)
+    return result
+  } catch (err) {
+    if (err.code === 26) {
+      // collection doesn't exist code
+      dbg(
+        'drop: attempted to drop non-existent collection=%o, continuing...',
+        collection.collectionName
+      )
+      return true
+    } else {
+      throw err
+    }
+  }
+}
