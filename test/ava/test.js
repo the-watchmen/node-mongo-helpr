@@ -1,5 +1,5 @@
 import test from 'ava'
-import debug from 'debug'
+import debug from '@watchmen/debug'
 import {assertAutomatedTest, initDb} from '@watchmen/mongo-test-helpr'
 import {
   parseParam,
@@ -15,8 +15,7 @@ import {
   options
 } from '../../src'
 
-/* eslint-disable new-cap */
-const dbg = debug('test:mongo-helpr')
+const dbg = debug(__filename)
 
 test('getDb: basic', async t => {
   const db1 = await getDb()
@@ -95,7 +94,13 @@ test('existsIndex', t => {
   ])
   t.deepEqual(existsIndex('foo', 'bar'), [
     {foo: 1, bar: 1},
-    {unique: true, partialFilterExpression: {foo: {$exists: true}, bar: {$exists: true}}}
+    {
+      unique: true,
+      partialFilterExpression: {
+        foo: {$exists: true},
+        bar: {$exists: true}
+      }
+    }
   ])
 })
 
