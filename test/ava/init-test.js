@@ -1,5 +1,5 @@
 import test from 'ava'
-import debug from 'debug'
+import debug from '@watchmen/debug'
 import {UNIQUENESS_ERROR} from '@watchmen/helpr'
 import {initDb} from '@watchmen/mongo-test-helpr'
 
@@ -14,8 +14,7 @@ import {
   requireOne
 } from '../../src'
 
-/* eslint-disable new-cap */
-const dbg = debug('test:mongo-helpr')
+const dbg = debug(__filename)
 
 test.beforeEach(async t => {
   const db = await getDb()

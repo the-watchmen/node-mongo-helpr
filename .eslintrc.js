@@ -1,7 +1,7 @@
 module.exports = {
-  extends: ['eslint:recommended', 'prettier'],
+  extends: ["eslint:recommended", "prettier"],
   parserOptions: {
-    sourceType: 'module',
+    sourceType: "module",
     ecmaVersion: 2017,
     ecmaFeatures: {
       experimentalObjectRestSpread: true
@@ -11,13 +11,13 @@ module.exports = {
     node: true,
     es6: true
   },
-  plugins: ['prettier'],
+  plugins: ["prettier"],
   rules: {
-    'unicorn/no-abusive-eslint-disable': 'off',
-    'import/no-unassigned-import': 'off',
-    'import/prefer-default-export': 'off',
-    'prettier/prettier': [
-      'error',
+    "unicorn/no-abusive-eslint-disable": "off",
+    "import/no-unassigned-import": "off",
+    "import/prefer-default-export": "off",
+    "prettier/prettier": [
+      "error",
       {
         singleQuote: true,
         semi: false,
@@ -26,4 +26,4 @@ module.exports = {
       }
     ]
   }
-}
+};

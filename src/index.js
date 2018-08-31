@@ -1,11 +1,11 @@
 import assert from 'assert'
 import mongodb from 'mongodb'
-import debug from 'debug'
 import _ from 'lodash'
 import config from 'config'
+import debug from '@watchmen/debug'
 import {stringify, debugElements, UNIQUENESS_ERROR} from '@watchmen/helpr'
 
-const dbg = debug('app:mongo-helpr')
+const dbg = debug(__filename)
 
 export const SEQUENCES_NAME = _.get(config, 'mongo.sequences', 'sequences')
 
@@ -38,7 +38,13 @@ setOption({
   option: 'socketTimeoutMS',
   hook: parseInt
 })
-setOption({config, options, key: 'mongo.poolSize', option: 'poolSize', hook: parseInt})
+setOption({
+  config,
+  options,
+  key: 'mongo.poolSize',
+  option: 'poolSize',
+  hook: parseInt
+})
 setOption({config, options, key: 'mongo.replicaSet', option: 'replicaSet'})
 
 // const client = mongodb.MongoClient
@@ -55,7 +61,10 @@ export async function getDb({init} = {}) {
   init && (await closeDb())
 
   if (!_mongoHelpr.client) {
-    const client = await mongodb.MongoClient.connect(getConnectionString(), options)
+    const client = await mongodb.MongoClient.connect(
+      getConnectionString(),
+      options
+    )
     assert(client, 'client expected')
     const db = client.db(dbName())
     assert(db, 'db expected')
@@ -189,7 +198,11 @@ export async function createIndices({indices, db, collectionName, isDrop}) {
       return Array.isArray(index) ? target.createIndex(...index) : target.createIndex(index)
     })
   )
-  debugElements({dbg, msg: `create-indices: collection=${collectionName}, indices`, o: indices})
+  debugElements({
+    dbg,
+    msg: `create-indices: collection=${collectionName}, indices`,
+    o: indices
+  })
   return true
 }
 
