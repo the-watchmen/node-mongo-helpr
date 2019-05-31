@@ -20,7 +20,7 @@ if (logLevel) {
 function setOption({options, config, key, option, hook = _.identity}) {
 	const value = _.get(config, key)
 	if (value) {
-		options[option] = hook(value)
+		options[option] = hook(value, options)
 	}
 }
 
@@ -50,25 +50,17 @@ setOption({config, options, key: 'mongo.replicaSet', option: 'replicaSet'})
 
 // https://mongodb.github.io/node-mongodb-native/3.2/tutorials/connect/ssl/
 //
-setOption({
-	config,
-	options,
-	key: 'mongo.sslValidate',
-	option: 'sslValidate',
-	hook: parseBoolean
-})
 
 setOption({
 	config,
 	options,
 	key: 'mongo.sslCA',
 	option: 'sslCA',
-	hook: parseFile
+	hook: (value, options) => {
+		options.sslValidate = true
+		return [fs.readFileSync(value)]
+	}
 })
-
-function parseFile(path) {
-	return [fs.readFileSync(path)]
-}
 
 // const client = mongodb.MongoClient
 let _mongoHelpr = {} // Singleton, see: http://stackoverflow.com/a/14464750/2371903
