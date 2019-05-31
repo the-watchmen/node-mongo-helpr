@@ -4,7 +4,7 @@ import mongodb from 'mongodb'
 import _ from 'lodash'
 import config from 'config'
 import debug from '@watchmen/debug'
-import {stringify, debugElements, UNIQUENESS_ERROR, parseBoolean} from '@watchmen/helpr'
+import {stringify, debugElements, UNIQUENESS_ERROR} from '@watchmen/helpr'
 
 const dbg = debug(__filename)
 
