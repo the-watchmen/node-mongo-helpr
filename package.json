@@ -1,14 +1,13 @@
 {
   "name": "@watchmen/mongo-helpr",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "",
   "main": "dist/index.js",
   "repository": "the-watchmen/node-mongo-helpr",
   "scripts": {
-    "ava": "yarn ava-single test/ava",
-    "ava-single": "cross-env DEBUG=test:*,app:*,lib:*,dbg:* NODE_ENV=auto ava -s",
+    "ava": "cross-env DEBUG=test:*,app:*,lib:*,dbg:* NODE_ENV=auto ava -s",
     "pretest": "xo",
-    "test": "yarn ava",
+    "test": "yarn ava test/ava",
     "prebuild": "yarn test",
     "build": "babel ./src -d ./dist"
   },
@@ -17,33 +16,39 @@
   "dependencies": {
     "@watchmen/debug": "^1.1.1",
     "@watchmen/helpr": "^2.3.5",
-    "config": "^2.0.1",
+    "config": "^3.1.0",
     "lodash": "^4.17.10",
     "mongodb": "^3.1.4"
   },
   "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/polyfill": "^7.4.4",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/register": "^7.4.4",
     "@watchmen/mongo-test-helpr": "^1.0.0",
-    "ava": "^0.25.0",
-    "babel-cli": "^6.24.1",
-    "babel-core": "^6.26.3",
-    "babel-eslint": "^9.0.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-stage-0": "^6.5.0",
+    "ava": "^1.4.1",
     "cross-env": "^5.2.0",
-    "eslint": "^5.4.0",
-    "eslint-config-prettier": "^3.0.1",
-    "eslint-plugin-prettier": "^2.6.2",
-    "prettier": "^1.14.2",
-    "xo": "^0.22.0"
+    "xo": "^0.24.0"
   },
   "xo": {
-    "useEslintrc": true
+    "prettier": true,
+    "rules": {
+      "new-cap": 0,
+      "no-unused-expressions": [
+        2,
+        {
+          "allowShortCircuit": true,
+          "allowTernary": true
+        }
+      ],
+      "capitalized-comments": 0
+    }
   },
   "ava": {
-    "babel": "inherit",
     "require": [
-      "babel-register",
-      "babel-polyfill"
+      "@babel/register",
+      "@babel/polyfill"
     ]
   },
   "publishConfig": {
