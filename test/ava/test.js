@@ -12,7 +12,8 @@ import {
 	createIndices,
 	sanitizeKeys,
 	getConnectionString,
-	options
+	options,
+	getAuthString
 } from '../../src'
 
 const dbg = debug(__filename)
@@ -208,6 +209,26 @@ test('options', t => {
 	t.deepEqual(options, {
 		connectTimeoutMS: 3000,
 		socketTimeoutMS: 3000
+	})
+})
+
+test('auth: none', t => {
+	t.is(getAuthString({}), '')
+})
+
+test('auth: both', t => {
+	t.is(getAuthString({user: 'user-1', password: 'pass-1'}), 'user-1:pass-1@')
+})
+
+test('auth: only user', t => {
+	t.throws(() => {
+		getAuthString({user: 'user-1'})
+	})
+})
+
+test('auth: only pass', t => {
+	t.throws(() => {
+		getAuthString({password: 'pass-1'})
 	})
 })
 
