@@ -4,7 +4,7 @@ import mongodb from 'mongodb'
 import _ from 'lodash'
 import config from 'config'
 import debug from '@watchmen/debug'
-import {stringify, debugElements, UNIQUENESS_ERROR} from '@watchmen/helpr'
+import {stringify, debugElements, UNIQUENESS_ERROR, xor} from '@watchmen/helpr'
 
 const dbg = debug(__filename)
 
@@ -68,8 +68,22 @@ let _mongoHelpr = {} // Singleton, see: http://stackoverflow.com/a/14464750/2371
 export function getConnectionString() {
 	const host = config.get('mongo.host')
 	const dbName = config.get('mongo.db')
-	dbg('get-connection-string: connect: host=%o, db=%o, options=%o', host, dbName, options)
-	return `mongodb://${host}/${dbName}`
+	const user = _.get(config, 'mongo.user')
+	const password = _.get(config, 'mongo.password')
+	const creds = getAuthString({user, password})
+	dbg(
+		'get-connection-string: connect: user=%o, host=%o, db=%o, options=%o',
+		user,
+		host,
+		dbName,
+		options
+	)
+	return `mongodb://${creds}${host}/${dbName}`
+}
+
+export function getAuthString({user, password}) {
+	assert(!xor(user, password), 'user and password required')
+	return user ? `${user}:${password}@` : ''
 }
 
 export async function getDb({init} = {}) {
