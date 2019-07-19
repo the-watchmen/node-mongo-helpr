@@ -83,7 +83,8 @@ export function getConnectionString() {
 
 export function getAuthString({user, password}) {
 	assert(!xor(user, password), 'user and password required')
-	return user ? `${user}:${password}@` : ''
+	// https://stackoverflow.com/a/48029805/2371903
+	return user ? `${user}:${encodeURIComponent(password)}@` : ''
 }
 
 export async function getDb({init} = {}) {
