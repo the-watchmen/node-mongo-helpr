@@ -58,6 +58,7 @@ setOption({
 	key: 'mongo.sslCA',
 	option: 'sslCA',
 	hook: (value, options) => {
+		options.ssl = true
 		options.sslValidate = true
 		return [fs.readFileSync(value)]
 	}
