@@ -208,7 +208,8 @@ test('getConnectionString', t => {
 test('options', t => {
 	t.deepEqual(options, {
 		connectTimeoutMS: 3000,
-		socketTimeoutMS: 3000
+		socketTimeoutMS: 3000,
+		useNewUrlParser: true
 	})
 })
 

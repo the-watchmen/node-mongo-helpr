@@ -25,6 +25,7 @@ function setOption({options, config, key, option, hook = _.identity}) {
 }
 
 export const options = {}
+
 setOption({
 	config,
 	options,
@@ -57,6 +58,7 @@ setOption({
 	key: 'mongo.sslCA',
 	option: 'sslCA',
 	hook: (value, options) => {
+		options.ssl = true
 		options.sslValidate = true
 		return [fs.readFileSync(value)]
 	}
@@ -91,6 +93,7 @@ export async function getDb({init} = {}) {
 	init && (await closeDb())
 
 	if (!_mongoHelpr.client) {
+		options.useNewUrlParser = true
 		const client = await mongodb.MongoClient.connect(getConnectionString(), options)
 		assert(client, 'client expected')
 		const db = client.db(dbName())
